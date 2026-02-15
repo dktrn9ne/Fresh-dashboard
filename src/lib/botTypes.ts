@@ -5,6 +5,12 @@ export type BotHealth = {
   version?: string;
 };
 
+export type AgentWatchlist = {
+  updatedAt: string | null;
+  wallets: string[];
+  lastTop?: Array<{ wallet: string; pnl?: number; volume?: number; trades?: number; roi?: number; username?: string }>;
+};
+
 export type BotSummary = {
   mode: {
     dryRun: boolean;

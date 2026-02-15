@@ -1,5 +1,5 @@
 import styles from './page.module.css';
-import { fetchEvents, fetchHealth, fetchSummary } from '@/lib/botFetch';
+import { fetchAgentWatchlist, fetchEvents, fetchHealth, fetchSummary } from '@/lib/botFetch';
 
 function money(n: number) {
   return n.toLocaleString(undefined, {
@@ -17,11 +17,13 @@ export default async function Home() {
   let health: any = null;
   let summary: any = null;
   let events: any[] = [];
+  let watchlist: any = null;
   let error: string | null = null;
 
   try {
     health = await fetchHealth();
     summary = await fetchSummary();
+    watchlist = await fetchAgentWatchlist();
     events = await fetchEvents(200);
   } catch (e: any) {
     error = e?.message ?? String(e);
@@ -133,6 +135,7 @@ export default async function Home() {
               </div>
             </div>
 
+<<<<<<< HEAD
             <div className={styles.panel}>
               <div className={styles.panelTitle}>Grid</div>
               <div className={styles.gridMini}>
@@ -197,6 +200,32 @@ export default async function Home() {
                       {ev.level}
                     </div>
                     <div style={{ opacity: 0.9, fontSize: 12, lineHeight: 1.35 }}>{ev.msg}</div>
+=======
+            <div className={styles.card}>
+              <h2>Agent watchlist (Top 25 by PnL)</h2>
+              <div><b>Updated:</b> {watchlist?.updatedAt ?? '—'}</div>
+              <div className={styles.events}>
+                {(watchlist?.lastTop ?? []).slice(0, 25).map((r: any, idx: number) => (
+                  <div key={idx} className={styles.eventRow}>
+                    <div className={styles.eventTs}>{String(idx + 1)}</div>
+                    <div className={styles.eventLvl}>{r.username ?? '—'}</div>
+                    <div className={styles.eventMsg}>
+                      {r.wallet} · pnl {r.pnl ?? '—'} · vol {r.volume ?? '—'} · trades {r.trades ?? '—'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.card}>
+              <h2>Recent events</h2>
+              <div className={styles.events}>
+                {events.slice(0, 200).map((ev, idx) => (
+                  <div key={idx} className={styles.eventRow}>
+                    <div className={styles.eventTs}>{ev.ts}</div>
+                    <div className={styles.eventLvl}>{ev.level}</div>
+                    <div className={styles.eventMsg}>{ev.msg}</div>
+ 41dc7a8 (Show agent watchlist top 25)
                   </div>
                 ))}
               </div>

@@ -1,4 +1,4 @@
-import { BotEvent, BotHealth, BotSummary } from './botTypes';
+import { AgentWatchlist, BotEvent, BotHealth, BotSummary } from './botTypes';
 
 function baseUrl() {
   const url = process.env.BOT_METRICS_URL;
@@ -26,5 +26,11 @@ export async function fetchSummary(): Promise<BotSummary> {
 export async function fetchEvents(limit = 200): Promise<BotEvent[]> {
   const res = await fetch(`${baseUrl()}/events?limit=${limit}`, { headers: headers(), cache: 'no-store' });
   if (!res.ok) throw new Error(`events: HTTP ${res.status}`);
+  return res.json();
+}
+
+export async function fetchAgentWatchlist(): Promise<AgentWatchlist> {
+  const res = await fetch(`${baseUrl()}/agent-watchlist`, { headers: headers(), cache: 'no-store' });
+  if (!res.ok) throw new Error(`agent-watchlist: HTTP ${res.status}`);
   return res.json();
 }
