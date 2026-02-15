@@ -135,7 +135,6 @@ export default async function Home() {
               </div>
             </div>
 
-<<<<<<< HEAD
             <div className={styles.panel}>
               <div className={styles.panelTitle}>Grid</div>
               <div className={styles.gridMini}>
@@ -156,10 +155,9 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* Data panels below (optional) */}
+        {/* Data panels below */}
         {connected && (
           <div style={{ marginTop: 14, display: 'grid', gap: 14 }}>
-            {/* Quick summary strip */}
             <div className={styles.panel}>
               <div className={styles.panelTitle}>Bot Summary</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 10 }}>
@@ -178,11 +176,43 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Events */}
+            <div className={styles.panel}>
+              <div className={styles.panelTitle}>Agent watchlist (Top 25 by PnL)</div>
+              <div style={{ marginTop: 10, opacity: 0.72, fontSize: 12 }}>
+                Updated: {watchlist?.updatedAt ?? '—'} · Watching: {(watchlist?.wallets ?? []).length}
+              </div>
+              <div style={{ marginTop: 10, display: 'grid', gap: 8 }}>
+                {(watchlist?.lastTop ?? []).slice(0, 10).map((r: any, idx: number) => (
+                  <div
+                    key={r.wallet ?? idx}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '38px 1fr',
+                      gap: 12,
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      border: '1px solid rgba(255,77,0,0.18)',
+                      background: 'rgba(0,0,0,0.18)',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div style={{ opacity: 0.7, fontSize: 12 }}>{idx + 1}</div>
+                    <div style={{ fontSize: 12, lineHeight: 1.35, opacity: 0.9 }}>
+                      <b style={{ color: 'rgba(255,255,255,0.92)' }}>{r.username ?? '—'}</b>{' '}
+                      <span style={{ opacity: 0.7 }}>{r.wallet}</span>
+                      <div style={{ marginTop: 4, opacity: 0.8 }}>
+                        pnl {r.pnl ?? '—'} · vol {r.volume ?? '—'} · trades {r.trades ?? '—'}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className={styles.panel}>
               <div className={styles.panelTitle}>Recent Events</div>
               <div style={{ marginTop: 10, display: 'grid', gap: 8 }}>
-                {events.slice(0, 20).map((ev, idx) => (
+                {events.slice(0, 12).map((ev, idx) => (
                   <div
                     key={idx}
                     style={{
@@ -200,32 +230,6 @@ export default async function Home() {
                       {ev.level}
                     </div>
                     <div style={{ opacity: 0.9, fontSize: 12, lineHeight: 1.35 }}>{ev.msg}</div>
-=======
-            <div className={styles.card}>
-              <h2>Agent watchlist (Top 25 by PnL)</h2>
-              <div><b>Updated:</b> {watchlist?.updatedAt ?? '—'}</div>
-              <div className={styles.events}>
-                {(watchlist?.lastTop ?? []).slice(0, 25).map((r: any, idx: number) => (
-                  <div key={idx} className={styles.eventRow}>
-                    <div className={styles.eventTs}>{String(idx + 1)}</div>
-                    <div className={styles.eventLvl}>{r.username ?? '—'}</div>
-                    <div className={styles.eventMsg}>
-                      {r.wallet} · pnl {r.pnl ?? '—'} · vol {r.volume ?? '—'} · trades {r.trades ?? '—'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.card}>
-              <h2>Recent events</h2>
-              <div className={styles.events}>
-                {events.slice(0, 200).map((ev, idx) => (
-                  <div key={idx} className={styles.eventRow}>
-                    <div className={styles.eventTs}>{ev.ts}</div>
-                    <div className={styles.eventLvl}>{ev.level}</div>
-                    <div className={styles.eventMsg}>{ev.msg}</div>
- 41dc7a8 (Show agent watchlist top 25)
                   </div>
                 ))}
               </div>
