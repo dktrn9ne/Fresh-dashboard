@@ -11,8 +11,8 @@
   --text-dim: rgba(255, 255, 255, 0.68);
   --text-faint: rgba(255, 255, 255, 0.45);
 
-  --accent: #ff6a00; /* safety orange */
-  --accent2: #ffb000; /* amber */
+  --accent: #ff4d00; /* neon orange */
+  --accent2: #ff8a00; /* hot amber */
   --good: #2ee59d;
   --warn: #ffb000;
   --bad: #ff4d4d;
@@ -35,8 +35,8 @@ body{
   margin:0;
   color: var(--text);
   background:
-    radial-gradient(900px 520px at 18% 6%, rgba(255,106,0,0.11) 0%, rgba(255,106,0,0) 62%),
-    radial-gradient(900px 520px at 82% 12%, rgba(255,176,0,0.08) 0%, rgba(255,176,0,0) 58%),
+    radial-gradient(900px 520px at 18% 6%, rgba(255,77,0,0.16) 0%, rgba(255,77,0,0) 62%),
+    radial-gradient(900px 520px at 82% 12%, rgba(255,138,0,0.12) 0%, rgba(255,138,0,0) 58%),
     radial-gradient(circle at top, #121826 0%, #05060a 52%, #020308 100%);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
   -webkit-font-smoothing: antialiased;
