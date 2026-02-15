@@ -2,7 +2,15 @@ import styles from './page.module.css';
 import { fetchEvents, fetchHealth, fetchSummary } from '@/lib/botFetch';
 
 function money(n: number) {
-  return n.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+  return n.toLocaleString(undefined, {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 2,
+  });
+}
+
+function safe(n: any, fallback: string) {
+  return n == null ? fallback : String(n);
 }
 
 export default async function Home() {
@@ -21,169 +29,191 @@ export default async function Home() {
 
   const connected = !error;
 
+  // Simple faux stats for the HUD style (until your API exposes these explicitly)
+  const os = safe(health?.os ?? health?.platform, '—');
+  const mem = safe(health?.memoryMb ?? health?.memMb, '—');
+  const cpu = safe(health?.cpu ?? health?.cpuModel, '—');
+  const tasks = safe(summary?.tasks?.total ?? summary?.tasksTotal, '—');
+  const running = safe(summary?.tasks?.running ?? summary?.tasksRunning, '—');
+  const uptime = safe(health?.uptimeDays != null ? `${health.uptimeDays} DAYS` : health?.uptime, '—');
+
   return (
-    <div className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <div className={styles.brand}>
-          <div className={styles.brandKicker}>FRESH DASHBOARD</div>
-          <div className={styles.brandTitle}>Polymarket Bot</div>
+    <div className={styles.screen}>
+      <div className={styles.frame}>
+        <div className={styles.grid}>
+          {/* HUD TOP */}
+          <div className={styles.hudLeft}>
+            <div className={styles.hash}>9eab62e327dbff6ca4d071f9ff0dfc9</div>
+            <div className={styles.khz}>
+              <div className={styles.khzRow}>
+                <span className={styles.khzArrow}>&gt;</span>
+                <span>2.10032 Khz</span>
+              </div>
+              <div className={styles.khzRow}>
+                <span className={styles.khzArrow}>&gt;</span>
+                <span>5.66421 Khz</span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.hudCenter}>
+            <div className={styles.gaugeLabel}>LOAD</div>
+            <div className={styles.gauge}>
+              <div className={styles.gaugeMarker} />
+            </div>
+          </div>
+
+          <div className={styles.hudRight}>
+            <div className={styles.sysTitle}>System Information</div>
+            <div className={styles.sysGrid}>
+              <div className={styles.sysRow}>
+                <div className={styles.sysKey}>OS:</div>
+                <div className={styles.sysVal}>{os}</div>
+              </div>
+              <div className={styles.sysRow}>
+                <div className={styles.sysKey}>MEMORY:</div>
+                <div className={styles.sysVal}>{mem}</div>
+              </div>
+              <div className={styles.sysRow}>
+                <div className={styles.sysKey}>CPU:</div>
+                <div className={styles.sysVal}>{cpu}</div>
+              </div>
+              <div className={styles.sysRow}>
+                <div className={styles.sysKey}>TASKS:</div>
+                <div className={styles.sysVal}>
+                  {tasks} TOTAL ({running} RUNNING)
+                </div>
+              </div>
+              <div className={styles.sysRow}>
+                <div className={styles.sysKey}>UPTIME:</div>
+                <div className={styles.sysVal}>{uptime}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* MENU */}
+          <div className={styles.menu}>
+            {[
+              ['F1', 'Menu'],
+              ['F2', 'Analyzer'],
+              ['F3', 'Data'],
+              ['F4', 'Search'],
+              ['F5', 'Settings'],
+              ['F6', 'Help'],
+              ['F7', 'Quit'],
+            ].map(([k, label]) => (
+              <div key={k} className={styles.menuItem}>
+                <div className={styles.menuKey}>{k}</div>
+                <div className={styles.menuName}>{label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* CENTER */}
+          <div className={styles.center}>
+            <div className={styles.hero}>
+              <span>DKTR N9NE</span>
+              <span>SYSTEMS</span>
+            </div>
+          </div>
+
+          {/* BOTTOM LEFT */}
+          <div className={styles.bottomLeft}>
+            <div className={styles.panel}>
+              <div className={styles.panelTitle}>Memory Usage</div>
+              <div className={styles.memMeta}>
+                <div>In use: {safe(health?.memoryInUseMb, '—')} MB</div>
+                <div>Available: {safe(health?.memoryAvailableMb, '—')} MB</div>
+                {!connected && <div style={{ color: 'rgba(255, 255, 255, 0.55)' }}>Not connected</div>}
+              </div>
+              <div className={styles.miniBars}>
+                {[0.82, 0.38, 0.58, 0.22, 0.66].map((h, i) => (
+                  <div key={i} className={styles.bar} style={{ height: `${Math.round(h * 84)}px` }} />
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.panel}>
+              <div className={styles.panelTitle}>Grid</div>
+              <div className={styles.gridMini}>
+                {Array.from({ length: 24 }).map((_, i) => (
+                  <div key={i} className={styles.gridCell} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* BOTTOM RIGHT */}
+          <div className={styles.bottomRight}>
+            <div className={styles.chartHead}>
+              <div className={styles.chartTitle}>Network Analyzer</div>
+              <div className={styles.chartSub}>{safe(summary?.net?.mbps ?? summary?.mbps, '—')} Mbps</div>
+            </div>
+            <div className={styles.spark} />
+          </div>
         </div>
 
-        <nav className={styles.nav}>
-          <div className={styles.navItem}>
-            <div className={styles.navItemLabel}>Overview</div>
-            <div className={styles.navItemKey}>F1</div>
-          </div>
-          <div className={styles.navItem}>
-            <div className={styles.navItemLabel}>Analyzer</div>
-            <div className={styles.navItemKey}>F2</div>
-          </div>
-          <div className={styles.navItem}>
-            <div className={styles.navItemLabel}>Data</div>
-            <div className={styles.navItemKey}>F3</div>
-          </div>
-          <div className={styles.navItem}>
-            <div className={styles.navItemLabel}>Search</div>
-            <div className={styles.navItemKey}>F4</div>
-          </div>
-          <div className={styles.navItem}>
-            <div className={styles.navItemLabel}>Settings</div>
-            <div className={styles.navItemKey}>F5</div>
-          </div>
-        </nav>
+        {/* Data panels below (optional) */}
+        {connected && (
+          <div style={{ marginTop: 14, display: 'grid', gap: 14 }}>
+            {/* Quick summary strip */}
+            <div className={styles.panel}>
+              <div className={styles.panelTitle}>Bot Summary</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 10 }}>
+                <div>
+                  <div style={{ opacity: 0.7, fontSize: 12 }}>Total exposure</div>
+                  <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.92)' }}>
+                    {money(summary?.exposure?.totalExposureUsd ?? 0)}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ opacity: 0.7, fontSize: 12 }}>Open orders</div>
+                  <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.92)' }}>
+                    {summary?.exposure?.openOrders ?? 0}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <div className={styles.sidebarFooter}>
-          <div className={styles.statusPill}>
-            <span className={`${styles.dot} ${connected ? styles.dotOk : styles.dotBad}`} />
-            {connected ? 'Connected' : 'Not connected'}
-          </div>
-        </div>
-      </aside>
-
-      <main className={styles.main}>
-        <header className={styles.header}>
-          <div>
-            <h1 className={styles.h1}>Dashboard</h1>
-            <div className={styles.sub}>
-              Read-only telemetry from your bot. Theme: <b>orange/black</b>.
+            {/* Events */}
+            <div className={styles.panel}>
+              <div className={styles.panelTitle}>Recent Events</div>
+              <div style={{ marginTop: 10, display: 'grid', gap: 8 }}>
+                {events.slice(0, 20).map((ev, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '160px 86px 1fr',
+                      gap: 12,
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      border: '1px solid rgba(255,77,0,0.18)',
+                      background: 'rgba(0,0,0,0.18)',
+                    }}
+                  >
+                    <div style={{ opacity: 0.65, fontSize: 12 }}>{ev.ts}</div>
+                    <div style={{ opacity: 0.85, fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                      {ev.level}
+                    </div>
+                    <div style={{ opacity: 0.9, fontSize: 12, lineHeight: 1.35 }}>{ev.msg}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
+        )}
 
-          <div className={styles.metrics}>
-            <div className={styles.chip}>
-              OS <b>{health?.os ?? '—'}</b>
-            </div>
-            <div className={styles.chip}>
-              Uptime <b>{health?.uptimeDays != null ? `${health.uptimeDays}d` : '—'}</b>
-            </div>
-            <div className={styles.chip}>
-              Version <b>{health?.version ?? '—'}</b>
-            </div>
-          </div>
-        </header>
-
-        {error ? (
-          <div className={`${styles.card} ${styles.span12}`}>
-            <h2>Not connected</h2>
-            <div className={styles.bigSub}>
+        {!connected && (
+          <div style={{ marginTop: 14 }} className={styles.panel}>
+            <div className={styles.panelTitle}>Not connected</div>
+            <div style={{ marginTop: 10, opacity: 0.75, fontSize: 12 }}>
               Set <code>BOT_METRICS_URL</code> (and optionally <code>BOT_METRICS_TOKEN</code>) in your environment.
             </div>
-            <pre className={styles.pre}>{error}</pre>
+            <pre style={{ marginTop: 10, overflow: 'auto', opacity: 0.85, fontSize: 12 }}>{error}</pre>
           </div>
-        ) : (
-          <>
-            <section className={styles.grid}>
-              <div className={`${styles.card} ${styles.span4}`}>
-                <h2>Health</h2>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>OK</div>
-                  <div className={styles.cardValue}>{String(health?.ok)}</div>
-                </div>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>Name</div>
-                  <div className={styles.cardValue}>{health?.name ?? '—'}</div>
-                </div>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>Time</div>
-                  <div className={styles.cardValue}>{health?.ts ?? '—'}</div>
-                </div>
-              </div>
-
-              <div className={`${styles.card} ${styles.span4}`}>
-                <h2>Exposure</h2>
-                <div className={styles.bigNumber}>{money(summary?.exposure?.totalExposureUsd ?? 0)}</div>
-                <div className={styles.bigSub}>Total exposure</div>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>Open orders</div>
-                  <div className={styles.cardValue}>{summary?.exposure?.openOrders ?? 0}</div>
-                </div>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>Realized PnL today</div>
-                  <div className={styles.cardValue}>{money(summary?.exposure?.realizedPnlTodayUsd ?? 0)}</div>
-                </div>
-              </div>
-
-              <div className={`${styles.card} ${styles.span4}`}>
-                <h2>Mode</h2>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>DRY_RUN</div>
-                  <div className={styles.cardValue}>{String(summary?.mode?.dryRun)}</div>
-                </div>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>LIVE_TRADING</div>
-                  <div className={styles.cardValue}>{String(summary?.mode?.liveTrading)}</div>
-                </div>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>STOP_TRADING</div>
-                  <div className={styles.cardValue}>{String(summary?.mode?.stopTrading)}</div>
-                </div>
-              </div>
-
-              <div className={`${styles.card} ${styles.span6}`}>
-                <h2>Risk caps</h2>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>Max per trade</div>
-                  <div className={styles.cardValue}>{money(summary?.risk?.maxPerTradeUsd ?? 0)}</div>
-                </div>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>Max per market</div>
-                  <div className={styles.cardValue}>{money(summary?.risk?.maxPerMarketUsd ?? 0)}</div>
-                </div>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>Max total</div>
-                  <div className={styles.cardValue}>{money(summary?.risk?.maxTotalExposureUsd ?? 0)}</div>
-                </div>
-                <div className={styles.cardRow}>
-                  <div className={styles.cardLabel}>Max daily loss</div>
-                  <div className={styles.cardValue}>{money(summary?.risk?.maxDailyLossUsd ?? 0)}</div>
-                </div>
-              </div>
-
-              <div className={`${styles.card} ${styles.span6}`}>
-                <h2>Events</h2>
-                <div className={styles.bigSub}>Last 200 (newest first)</div>
-                <div className={styles.events}>
-                  {events.slice(0, 200).map((ev, idx) => {
-                    const lvl = String(ev.level || '').toLowerCase();
-                    const lvlClass = lvl.includes('error')
-                      ? styles.lvlError
-                      : lvl.includes('warn')
-                      ? styles.lvlWarn
-                      : styles.lvlInfo;
-                    return (
-                      <div key={idx} className={styles.eventRow}>
-                        <div className={styles.eventTs}>{ev.ts}</div>
-                        <div className={`${styles.eventLvl} ${lvlClass}`}>{ev.level}</div>
-                        <div className={styles.eventMsg}>{ev.msg}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
-          </>
         )}
-      </main>
+      </div>
     </div>
   );
 }
