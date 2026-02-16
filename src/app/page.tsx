@@ -39,6 +39,11 @@ export default async function Home() {
   const running = safe(summary?.tasks?.running ?? summary?.tasksRunning, '—');
   const uptime = safe(health?.uptimeDays != null ? `${health.uptimeDays} DAYS` : health?.uptime, '—');
 
+  const totalExposureUsd = summary?.exposure?.totalExposureUsd ?? 0;
+  const realizedPnlTodayUsd = summary?.exposure?.realizedPnlTodayUsd ?? 0;
+  const openOrders = summary?.exposure?.openOrders ?? 0;
+  const stopTrading = Boolean(summary?.mode?.stopTrading);
+
   return (
     <div className={styles.screen}>
       <div className={styles.frame}>
@@ -111,11 +116,37 @@ export default async function Home() {
             ))}
           </div>
 
-          {/* CENTER */}
+          {/* CENTER (Above-the-fold KPIs) */}
           <div className={styles.center}>
             <div className={styles.hero}>
               <span>DKTR N9NE</span>
               <span>SYSTEMS</span>
+            </div>
+
+            <div className={styles.centerMetrics}>
+              <div className={styles.kpi}>
+                <div className={styles.kpiLabel}>Total Exposure</div>
+                <div className={styles.kpiValue}>{money(totalExposureUsd)}</div>
+                <div className={styles.kpiSub}>Across all markets</div>
+              </div>
+
+              <div className={styles.kpi}>
+                <div className={styles.kpiLabel}>Realized PnL Today</div>
+                <div className={styles.kpiValue}>{money(realizedPnlTodayUsd)}</div>
+                <div className={styles.kpiSub}>Closed positions</div>
+              </div>
+
+              <div className={styles.kpi}>
+                <div className={styles.kpiLabel}>Open Orders</div>
+                <div className={styles.kpiValue}>{String(openOrders)}</div>
+                <div className={styles.kpiSub}>Pending executions</div>
+              </div>
+
+              <div className={`${styles.kpi} ${stopTrading ? styles.alert : ''}`}>
+                <div className={styles.kpiLabel}>STOP_TRADING</div>
+                <div className={styles.kpiValue}>{stopTrading ? 'TRUE' : 'FALSE'}</div>
+                <div className={styles.kpiSub}>{stopTrading ? 'Trading halted' : 'System normal'}</div>
+              </div>
             </div>
           </div>
 
@@ -159,19 +190,23 @@ export default async function Home() {
         {connected && (
           <div style={{ marginTop: 14, display: 'grid', gap: 14 }}>
             <div className={styles.panel}>
-              <div className={styles.panelTitle}>Bot Summary</div>
+              <div className={styles.panelTitle}>Risk caps</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 10 }}>
                 <div>
-                  <div style={{ opacity: 0.7, fontSize: 12 }}>Total exposure</div>
-                  <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.92)' }}>
-                    {money(summary?.exposure?.totalExposureUsd ?? 0)}
-                  </div>
+                  <div style={{ opacity: 0.7, fontSize: 12 }}>Max per trade</div>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)' }}>{money(summary?.risk?.maxPerTradeUsd ?? 0)}</div>
                 </div>
                 <div>
-                  <div style={{ opacity: 0.7, fontSize: 12 }}>Open orders</div>
-                  <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.92)' }}>
-                    {summary?.exposure?.openOrders ?? 0}
-                  </div>
+                  <div style={{ opacity: 0.7, fontSize: 12 }}>Max per market</div>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)' }}>{money(summary?.risk?.maxPerMarketUsd ?? 0)}</div>
+                </div>
+                <div>
+                  <div style={{ opacity: 0.7, fontSize: 12 }}>Max total exposure</div>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)' }}>{money(summary?.risk?.maxTotalExposureUsd ?? 0)}</div>
+                </div>
+                <div>
+                  <div style={{ opacity: 0.7, fontSize: 12 }}>Max daily loss</div>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)' }}>{money(summary?.risk?.maxDailyLossUsd ?? 0)}</div>
                 </div>
               </div>
             </div>
